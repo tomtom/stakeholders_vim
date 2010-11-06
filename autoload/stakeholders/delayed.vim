@@ -2,23 +2,28 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-05.
-" @Last Change: 2010-11-05.
-" @Revision:    53
+" @Last Change: 2010-11-06.
+" @Revision:    55
 
 
 
 let s:prototype = {} "{{{2
+
+" Replace placeholders after the cursor leaves the pre-defined place or 
+" the moves to another line.
 function! stakeholders#delayed#Init(ph_def) "{{{3
     call extend(a:ph_def, s:prototype)
     return a:ph_def
 endf
 
 
+" :nodoc:
 function! s:prototype.Update(pos) dict "{{{3
     return a:pos
 endf
 
 
+" :nodoc:
 function! s:prototype.End(pos) dict "{{{3
     echom "DBG delayed.End" self.placeholder
     let pos = a:pos
@@ -34,6 +39,7 @@ function! s:prototype.End(pos) dict "{{{3
 endf
 
 
+" :nodoc:
 function! s:prototype.ReplacePlaceholderInPart(text) dict "{{{3
     return a:text
 endf

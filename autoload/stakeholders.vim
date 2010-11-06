@@ -221,11 +221,13 @@ function! s:Init(ph_def, placeholder) "{{{3
 endf
 
 
+" :nodoc:
 function! stakeholders#Replace(ph_def, text) "{{{3
     return substitute(a:text, a:ph_def.placeholder_rx, escape(a:ph_def.replacement, '\&~'), 'g')
 endf
 
 
+" :nodoc:
 function! stakeholders#ReplacePlaceholderInCurrentLine(ph_def, pos, line, rline) "{{{3
     let m = matchlist(a:rline, printf(a:ph_def.prepost_rx_fmt, a:ph_def.replacement))
     if empty(m)

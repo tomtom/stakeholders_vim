@@ -2,18 +2,21 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-05.
-" @Last Change: 2010-11-05.
-" @Revision:    29
+" @Last Change: 2010-11-06.
+" @Revision:    31
 
 
 
 let s:prototype = {} "{{{2
+
+" Expand placeholders as the user types.
 function! stakeholders#immediate#Init(ph_def) "{{{3
     call extend(a:ph_def, s:prototype)
     return a:ph_def
 endf
 
 
+" :nodoc:
 function! s:prototype.Update(pos) dict "{{{3
     let pos = a:pos
     for [lnum, line] in items(self.lines)
@@ -28,12 +31,14 @@ function! s:prototype.Update(pos) dict "{{{3
 endf
 
 
+" :nodoc:
 function! s:prototype.End(pos) dict "{{{3
     unlet self.placeholder
     return a:pos
 endf
 
 
+" :nodoc:
 function! s:prototype.ReplacePlaceholderInPart(text) dict "{{{3
     return stakeholders#Replace(self, a:text)
 endf
