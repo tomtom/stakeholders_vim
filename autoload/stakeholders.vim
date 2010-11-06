@@ -3,7 +3,7 @@
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
 " @Last Change: 2010-11-06.
-" @Revision:    422
+" @Revision:    446
 
 
 if exists('loaded_stakeholders')
@@ -13,12 +13,16 @@ let loaded_stakeholders = 1
 
 
 if !exists('g:stakeholders#rx')
-    let g:stakeholders#rx = '<+\([[:uppper:]_]\+\)+>'   "{{{2
+    " A |regexp| that matches placeholders.
+    let g:stakeholders#rx = '<+\([[:alpha:]_]\+\)+>'   "{{{2
 endif
 
 
 if !exists('g:stakeholders#expansion')
-    let g:stakeholders#expansion = 'delayed'   "{{{2
+    " The type of placeholder expansion. Possible values:
+    "   - delayed (see |stakeholders#delayed#Init()|)
+    "   - immediate (see |stakeholders#immediate#Init()|)
+    let g:stakeholders#expansion = 'immediate'   "{{{2
 endif
 
 
@@ -29,11 +33,11 @@ augroup stakeholders
 augroup END
 
 
-function! stakeholders#Disable() "{{{3
-    augroup stakeholders
-        autocmd! stakeholders BufEnter *
-    augroup END
-endf
+" function! stakeholders#Disable() "{{{3
+"     augroup stakeholders
+"         autocmd! stakeholders BufEnter *
+"     augroup END
+" endf
 
 
 " function! stakeholders#Enable() "{{{3
@@ -43,18 +47,22 @@ endf
 " endf
 
 
+" Enable stakeholders for a range of lines.
 function! stakeholders#EnableInRange(line1, line2) "{{{3
-    if !exists('b:stakeholders')
+    if !exists('b:stakeholders_range')
         let b:stakeholders_range = [a:line1, a:line2]
+        " echom "DBG stakeholders#EnableInRange" string(b:stakeholders_range)
         call stakeholders#EnableBuffer()
     endif
 endf
 
 
+" Enable stakeholders for the current buffer.
 function! stakeholders#EnableBuffer() "{{{3
     if !exists('b:stakeholders')
         let b:stakeholders = exists('b:stakeholders_rx') ? 
                     \ b:stakeholders_rx : g:stakeholders#rx
+        " echom "DBG stakeholders#EnableBuffer" b:stakeholders
         autocmd stakeholders CursorMoved <buffer> call s:CursorMoved('n')
         autocmd stakeholders CursorMovedI <buffer> call s:CursorMoved('i')
         call s:CursorMoved('n')
@@ -62,9 +70,10 @@ function! stakeholders#EnableBuffer() "{{{3
 endf
 
 
+" Disable stakeholders for the current buffer.
 function! stakeholders#DisableBuffer() "{{{3
     if exists('b:stakeholders')
-        unlet! b:stakeholders b:stakeholders_range
+        unlet! b:stakeholders b:stakeholders_range w:stakeholders
         autocmd! stakeholders CursorMoved,CursorMovedI <buffer>
     endif
 endf
@@ -81,15 +90,23 @@ function! s:SetContext(pos) "{{{3
     if exists('b:stakeholders_range') && (pos[1] < b:stakeholders_range[0] || pos[1] > b:stakeholders_range[1])
         call stakeholders#DisableBuffer()
     else
+        if exists('w:stakeholders.lnum')
+            let lnum0 = w:stakeholders.lnum
+        else
+            let lnum0 = 0
+        endif
+        let lnum = line('.')
         let w:stakeholders = {
-                    \ 'lnum': line('.')
+                    \ 'lnum': lnum
                     \ }
         let line = getline('.')
-        if line !~ b:stakeholders
-            let line = ''
+        if lnum != lnum0 && line !~ b:stakeholders
+            let w:stakeholders.line = ''
+            let w:stakeholders.parts = []
+        else
+            let w:stakeholders.line = line
+            let w:stakeholders.parts = s:GetParts(line)
         endif
-        let w:stakeholders.line = line
-        let w:stakeholders.parts = s:GetParts(line)
         " TLogVAR w:stakeholders
     endif
     return pos
@@ -104,6 +121,7 @@ endf
 function! s:CursorMoved(mode) "{{{3
     " TLogVAR line('.')
     let pos = getpos('.')
+    " echom "DBG CursorMoved" string(pos)
     try
         let lnum = line('.')
         if !exists('w:stakeholders') || w:stakeholders.lnum != lnum
@@ -153,6 +171,9 @@ function! s:CursorMoved(mode) "{{{3
                             if ph_pb != ph || parts[i + 1 : -1] != rest
                                 let pre = pa[0 : -len(ph) - 1]
                                 let pre = prefix . pre
+                                if len(pre) > ccol
+                                    break
+                                endif
                                 let pre_rx = escape(pre, '\')
                                 let post = join(rest, '')
                                 let post_rx = escape(post, '\')
