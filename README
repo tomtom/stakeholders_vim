@@ -1,0 +1,27 @@
+Older templating plugins for VIM often used simple markup for placeholders 
+(e.g. <+VARIABLE_NAME+>). A placeholder was simple a pattern you could easily 
+search for. Some newer templating plugins support dynamic replacement of 
+placeholders with the same name.
+
+This plugin provides dynamic replacement of placeholders for older 
+templating plugins. By default, it assumes placeholders match 
+/<+\([[:alpha:]_]\+\)+>/ since this pattern is used in several 
+templating systems. You can easily change that pattern by setting 
+|g:stakeholders#rx| or b:stakeholders_rx.
+
+
+Usage~
+
+The tskeleton templating plugin provides a parameter 
+(|g:tskeleton#enable_stakeholders|) that enables integration with the 
+stakeholders plugin. For other templating plugins, you have to enable 
+stakeholders by calling either |stakeholders#EnableBuffer()| or 
+|stakeholders#EnableInRange()|.
+
+
+-----------------------------------------------------------------------
+
+Status:  Experimental
+Install: See http://github.com/tomtom/vimtlib/blob/master/INSTALL.TXT
+See http://github.com/tomtom for related plugins.
+
