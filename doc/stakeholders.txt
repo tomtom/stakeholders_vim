@@ -6,11 +6,12 @@ Older templating plugins for VIM often used simple markup for placeholders
 search for. Some newer templating plugins support dynamic replacement of 
 placeholders with the same name.
 
-This plugin provides dynamic replacement of placeholders for older 
-templating plugins. By default, it assumes placeholders match 
+The stakeholders plugin turns your old templating system into a high 
+potential overachiever. It provides dynamic replacement of placeholders 
+for older templating plugins. By default, it assumes placeholders match 
 /<+\([[:alpha:]_]\+\)+>/ since this pattern is used in several 
 templating systems. You can easily change that pattern by setting 
-|g:stakeholders#rx| or b:stakeholders_rx.
+|g:stakeholders#def| or b:stakeholders_def.
 
 
 Usage~
@@ -39,7 +40,7 @@ This script requires tlib (vimscript #1863) to be installed.
 ========================================================================
 Contents~
 
-        g:stakeholders#rx ..................... |g:stakeholders#rx|
+        g:stakeholders#def .................... |g:stakeholders#def|
         g:stakeholders#expansion .............. |g:stakeholders#expansion|
         stakeholders#EnableInRange ............ |stakeholders#EnableInRange()|
         stakeholders#EnableBuffer ............. |stakeholders#EnableBuffer()|
@@ -51,12 +52,13 @@ Contents~
 ========================================================================
 autoload/stakeholders.vim~
 
-                                                    *g:stakeholders#rx*
-g:stakeholders#rx              (default: '<+\([[:alpha:]_]\+\)+>')
-    A |regexp| that matches placeholders.
+                                                    *g:stakeholders#def*
+g:stakeholders#def             (default: {'rx': '<+\([[:alpha:]_]\+\)+>'})
+    The placeholder definition. A dictionary with the fields:
+      rx ....... A |regexp| that matches placeholders.
 
                                                     *g:stakeholders#expansion*
-g:stakeholders#expansion       (default: 'delayed')
+g:stakeholders#expansion       (default: 'immediate')
     The type of placeholder expansion. Possible values:
       - delayed (see |stakeholders#delayed#Init()|)
       - immediate (see |stakeholders#immediate#Init()|)
