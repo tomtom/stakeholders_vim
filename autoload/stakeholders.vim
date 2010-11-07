@@ -3,7 +3,7 @@
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
 " @Last Change: 2010-11-06.
-" @Revision:    446
+" @Revision:    452
 
 
 if exists('loaded_stakeholders')
@@ -12,9 +12,10 @@ endif
 let loaded_stakeholders = 1
 
 
-if !exists('g:stakeholders#rx')
-    " A |regexp| that matches placeholders.
-    let g:stakeholders#rx = '<+\([[:alpha:]_]\+\)+>'   "{{{2
+if !exists('g:stakeholders#def')
+    " The placeholder definition. A dictionary with the fields:
+    "   rx ....... A |regexp| that matches placeholders.
+    let g:stakeholders#def = {'rx': '<+\([[:alpha:]_]\+\)+>'}   "{{{2
 endif
 
 
@@ -35,7 +36,7 @@ augroup END
 
 " function! stakeholders#Disable() "{{{3
 "     augroup stakeholders
-"         autocmd! stakeholders BufEnter *
+"         autocmd! BufEnter *
 "     augroup END
 " endf
 
@@ -49,7 +50,7 @@ augroup END
 
 " Enable stakeholders for a range of lines.
 function! stakeholders#EnableInRange(line1, line2) "{{{3
-    if !exists('b:stakeholders_range')
+    if !exists('b:stakeholders')
         let b:stakeholders_range = [a:line1, a:line2]
         " echom "DBG stakeholders#EnableInRange" string(b:stakeholders_range)
         call stakeholders#EnableBuffer()
@@ -60,8 +61,8 @@ endf
 " Enable stakeholders for the current buffer.
 function! stakeholders#EnableBuffer() "{{{3
     if !exists('b:stakeholders')
-        let b:stakeholders = exists('b:stakeholders_rx') ? 
-                    \ b:stakeholders_rx : g:stakeholders#rx
+        let b:stakeholders = exists('b:stakeholders_def') ? 
+                    \ b:stakeholders_def.rx : g:stakeholders#def.rx
         " echom "DBG stakeholders#EnableBuffer" b:stakeholders
         autocmd stakeholders CursorMoved <buffer> call s:CursorMoved('n')
         autocmd stakeholders CursorMovedI <buffer> call s:CursorMoved('i')
