@@ -19,6 +19,9 @@ stakeholders plugin. For other templating plugins, you have to enable
 stakeholders by calling either |stakeholders#EnableBuffer()| or 
 |stakeholders#EnableInRange()|.
 
+Demo: 
+http://vimsomnia.blogspot.com/2010/11/tskeleton-and-stakeholders-vim-plugins.html
+
 Also available via git: http://github.com/tomtom/stakeholders_vim/
 
 
