@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-06.
-" @Revision:    452
+" @Last Change: 2010-11-08.
+" @Revision:    455
 
 
 if exists('loaded_stakeholders')
@@ -124,10 +124,8 @@ function! s:CursorMoved(mode) "{{{3
     let pos = getpos('.')
     " echom "DBG CursorMoved" string(pos)
     try
-        let lnum = line('.')
-        if !exists('w:stakeholders') || w:stakeholders.lnum != lnum
-            let pos = s:SetContext(pos)
-        elseif !empty(w:stakeholders.line)
+        " let lnum = line('.')
+        if exists('w:stakeholders') && !empty(w:stakeholders.line)
             let line = getline('.')
             if line != w:stakeholders.line
                 let ph_rx = b:stakeholders .'$'
@@ -204,6 +202,8 @@ function! s:CursorMoved(mode) "{{{3
                     let pos = s:SetContext(pos)
                 endif
             endif
+        else
+            let pos = s:SetContext(pos)
         endif
     finally
         call setpos('.', pos)
