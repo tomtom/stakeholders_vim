@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-08.
-" @Revision:    455
+" @Last Change: 2010-11-13.
+" @Revision:    476
 
 
 if exists('loaded_stakeholders')
@@ -101,7 +101,7 @@ function! s:SetContext(pos) "{{{3
                     \ 'lnum': lnum
                     \ }
         let line = getline('.')
-        if lnum != lnum0 && line !~ b:stakeholders
+        if line !~ b:stakeholders
             let w:stakeholders.line = ''
             let w:stakeholders.parts = []
         else
@@ -124,9 +124,9 @@ function! s:CursorMoved(mode) "{{{3
     let pos = getpos('.')
     " echom "DBG CursorMoved" string(pos)
     try
-        " let lnum = line('.')
-        if exists('w:stakeholders') && !empty(w:stakeholders.line)
-            let line = getline('.')
+        let lnum = line('.')
+        if exists('w:stakeholders') && !empty(w:stakeholders.line) && w:stakeholders.lnum == lnum
+            let line = getline(lnum)
             if line != w:stakeholders.line
                 let ph_rx = b:stakeholders .'$'
                 " n1: foo <+TODO+> bar
@@ -138,12 +138,18 @@ function! s:CursorMoved(mode) "{{{3
                 let set_context = 1
                 let pcol = 1
                 let ccol = col('.')
+                if a:mode == 'i' && ccol < col('$')
+                    let ccol -= 1
+                endif
                 let prefix = ''
                 if has_key(w:stakeholders, 'replacement')
                     let pre = w:stakeholders.ReplacePlaceholderInPart(w:stakeholders.pre)
                     let post = w:stakeholders.ReplacePlaceholderInPart(w:stakeholders.post)
                     let line = getline('.')
-                    if ccol > len(pre) && ccol <= len(line) - len(post) + 1
+                    let cmin = len(pre)
+                    let cmax = len(line) - len(post) + 1
+                    " echom "DBG CursorMoved" ccol cmin cmax
+                    if ccol > cmin && ccol <= cmax
                         let w:stakeholders.pre_rx = escape(pre, '\')
                         let w:stakeholders.post_rx = escape(post, '\')
                         let repl_rx = '\V\^'. w:stakeholders.pre_rx .'\zs\(\.\{-}\)\ze'. w:stakeholders.post_rx .'\$'
@@ -170,7 +176,9 @@ function! s:CursorMoved(mode) "{{{3
                             if ph_pb != ph || parts[i + 1 : -1] != rest
                                 let pre = pa[0 : -len(ph) - 1]
                                 let pre = prefix . pre
-                                if len(pre) > ccol
+                                let lpre = len(pre)
+                                " echom "DBG CursorMoved lpre, col" lpre ccol
+                                if lpre >= ccol
                                     break
                                 endif
                                 let pre_rx = escape(pre, '\')
@@ -191,7 +199,7 @@ function! s:CursorMoved(mode) "{{{3
                         endif
                         let prefix .= pb
                         let pcol += len(pb)
-                        if pcol > ccol
+                        if pcol >= ccol
                             break
                         endif
                     endfor

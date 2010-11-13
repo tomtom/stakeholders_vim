@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-05.
-" @Last Change: 2010-11-06.
-" @Revision:    31
+" @Last Change: 2010-11-13.
+" @Revision:    33
 
 
 
@@ -18,15 +18,17 @@ endf
 
 " :nodoc:
 function! s:prototype.Update(pos) dict "{{{3
-    let pos = a:pos
-    for [lnum, line] in items(self.lines)
-        if lnum == self.lnum
-            let [pos, line1] = stakeholders#ReplacePlaceholderInCurrentLine(self, pos, self.line, getline('.'))
-        else
-            let line1 = stakeholders#Replace(self, line)
-        endif
-        keepjumps call setline(lnum, line1)
-    endfor
+    if a:pos[1] == line('.')
+        let pos = a:pos
+        for [lnum, line] in items(self.lines)
+            if lnum == self.lnum
+                let [pos, line1] = stakeholders#ReplacePlaceholderInCurrentLine(self, pos, self.line, getline('.'))
+            else
+                let line1 = stakeholders#Replace(self, line)
+            endif
+            keepjumps call setline(lnum, line1)
+        endfor
+    endif
     return pos
 endf
 
