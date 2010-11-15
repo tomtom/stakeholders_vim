@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-13.
-" @Revision:    476
+" @Last Change: 2010-11-15.
+" @Revision:    484
 
 
 if exists('loaded_stakeholders')
@@ -24,6 +24,11 @@ if !exists('g:stakeholders#expansion')
     "   - delayed (see |stakeholders#delayed#Init()|)
     "   - immediate (see |stakeholders#immediate#Init()|)
     let g:stakeholders#expansion = 'immediate'   "{{{2
+endif
+
+
+if !exists('g:stakeholders#exclude_rx')
+    let g:stakeholders#exclude_rx = '^TODO$'   "{{{2
 endif
 
 
@@ -129,12 +134,9 @@ function! s:CursorMoved(mode) "{{{3
             let line = getline(lnum)
             if line != w:stakeholders.line
                 let ph_rx = b:stakeholders .'$'
-                " n1: foo <+TODO+> bar
-                " n2: foo <+TODO+> bar bla <+TODO+> bla
-                " obs:  foo <+TODO+> bar bla <+TODO+> bla
-                " ign:  oo <+TODO+> bar bla <+TODO+> bla
-                " ign:  oo aaaassadlkjsdkjalks bar bla aaaassadlkjsdkjalks bla
-                " TODO: check only the part where the cursor is
+                " n1: foo <+FOO+> bar
+                " n2: foo <+FOO+> bar bla <+FOO+> bla
+                " obs:  foo <+FOO+> bar bla <+FOO+>
                 let set_context = 1
                 let pcol = 1
                 let ccol = col('.')
@@ -170,31 +172,33 @@ function! s:CursorMoved(mode) "{{{3
                         " TLogVAR pa, pb
                         if pa != pb && pa =~ ph_rx
                             let ph = matchstr(pa, ph_rx)
-                            let ph_pb = pb[-len(ph) - 1 : -1]
-                            let rest = w:stakeholders.parts[i + 1 : -1]
-                            " TLogVAR ph, ph_pb
-                            if ph_pb != ph || parts[i + 1 : -1] != rest
-                                let pre = pa[0 : -len(ph) - 1]
-                                let pre = prefix . pre
-                                let lpre = len(pre)
-                                " echom "DBG CursorMoved lpre, col" lpre ccol
-                                if lpre >= ccol
+                            if empty(g:stakeholders#exclude_rx) || ph !~ g:stakeholders#exclude_rx
+                                let ph_pb = pb[-len(ph) - 1 : -1]
+                                let rest = w:stakeholders.parts[i + 1 : -1]
+                                " TLogVAR ph, ph_pb
+                                if ph_pb != ph || parts[i + 1 : -1] != rest
+                                    let pre = pa[0 : -len(ph) - 1]
+                                    let pre = prefix . pre
+                                    let lpre = len(pre)
+                                    " echom "DBG CursorMoved lpre, col" lpre ccol
+                                    if lpre >= ccol
+                                        break
+                                    endif
+                                    let pre_rx = escape(pre, '\')
+                                    let post = join(rest, '')
+                                    let post_rx = escape(post, '\')
+                                    let repl_rx = '\V\^'. pre_rx .'\zs\(\.\{-}\)\ze'. post_rx .'\$'
+                                    let w:stakeholders.replacement = matchstr(line, repl_rx)
+                                    let w:stakeholders.pre = pre
+                                    let w:stakeholders.pre_rx = pre_rx
+                                    let w:stakeholders.post = post
+                                    let w:stakeholders.post_rx = post_rx
+                                    call s:Init(w:stakeholders, ph)
+                                    let pos = w:stakeholders.Update(pos)
+                                    " echom "DBG w:stakeholders" string(w:stakeholders)
+                                    let set_context = 0
                                     break
                                 endif
-                                let pre_rx = escape(pre, '\')
-                                let post = join(rest, '')
-                                let post_rx = escape(post, '\')
-                                let repl_rx = '\V\^'. pre_rx .'\zs\(\.\{-}\)\ze'. post_rx .'\$'
-                                let w:stakeholders.replacement = matchstr(line, repl_rx)
-                                let w:stakeholders.pre = pre
-                                let w:stakeholders.pre_rx = pre_rx
-                                let w:stakeholders.post = post
-                                let w:stakeholders.post_rx = post_rx
-                                call s:Init(w:stakeholders, ph)
-                                let pos = w:stakeholders.Update(pos)
-                                " echom "DBG w:stakeholders" string(w:stakeholders)
-                                let set_context = 0
-                                break
                             endif
                         endif
                         let prefix .= pb
