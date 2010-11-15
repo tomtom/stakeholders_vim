@@ -37,14 +37,13 @@ In order to install the vba, open the vba file in VIM and type: >
 
 See :help vimball for details.
 
-This script requires tlib (vimscript #1863) to be installed.
-
 
 ========================================================================
 Contents~
 
         g:stakeholders#def .................... |g:stakeholders#def|
         g:stakeholders#expansion .............. |g:stakeholders#expansion|
+        g:stakeholders#exclude_rx ............. |g:stakeholders#exclude_rx|
         stakeholders#EnableInRange ............ |stakeholders#EnableInRange()|
         stakeholders#EnableBuffer ............. |stakeholders#EnableBuffer()|
         stakeholders#DisableBuffer ............ |stakeholders#DisableBuffer()|
@@ -65,6 +64,9 @@ g:stakeholders#expansion       (default: 'immediate')
     The type of placeholder expansion. Possible values:
       - delayed (see |stakeholders#delayed#Init()|)
       - immediate (see |stakeholders#immediate#Init()|)
+
+                                                    *g:stakeholders#exclude_rx*
+g:stakeholders#exclude_rx      (default: '^TODO$')
 
                                                     *stakeholders#EnableInRange()*
 stakeholders#EnableInRange(line1, line2)

@@ -3,11 +3,12 @@
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
 " @Last Change: 2010-11-15.
-" @Revision:    484
+" @Revision:    486
+" GetLatestVimScripts: 3326 0 :AutoInstall: stakeholders.vim
 
 
 if exists('loaded_stakeholders')
-    " finish
+    finish
 endif
 let loaded_stakeholders = 1
 
