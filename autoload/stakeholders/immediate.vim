@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-05.
-" @Last Change: 2010-11-13.
-" @Revision:    33
+" @Last Change: 2010-11-16.
+" @Revision:    34
 
 
 
@@ -22,7 +22,7 @@ function! s:prototype.Update(pos) dict "{{{3
         let pos = a:pos
         for [lnum, line] in items(self.lines)
             if lnum == self.lnum
-                let [pos, line1] = stakeholders#ReplacePlaceholderInCurrentLine(self, pos, self.line, getline('.'))
+                let [pos, line1] = stakeholders#ReplacePlaceholderInCurrentLine(self, pos, self.line, getline(lnum))
             else
                 let line1 = stakeholders#Replace(self, line)
             endif
