@@ -1,5 +1,5 @@
 Older templating plugins for VIM often used simple markup for placeholders 
-(e.g. <+VARIABLE_NAME+>). A placeholder was simple a pattern you could easily 
+(e.g. <+VARIABLE_NAME+>). A placeholder was simply a pattern you could easily 
 search for. Some newer templating plugins support dynamic replacement of 
 placeholders with the same name.
 
@@ -22,8 +22,15 @@ stakeholders by calling either |stakeholders#EnableBuffer()| or
 Demo: 
 http://vimsomnia.blogspot.com/2010/11/tskeleton-and-stakeholders-vim-plugins.html
 
-Also available via git: http://github.com/tomtom/stakeholders_vim/
 
+Known issues~
+
+    - Replacing a visual selection by pasting text (using paste#Paste()) 
+      doesn't work. You have to delete the selection first and paste the 
+      text afterwards.
+
+
+Also available via git: http://github.com/tomtom/stakeholders_vim/
 
 -----------------------------------------------------------------------
 
