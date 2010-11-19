@@ -2,8 +2,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-17.
-" @Revision:    727
+" @Last Change: 2010-11-19.
+" @Revision:    735
 " GetLatestVimScripts: 3326 0 :AutoInstall: stakeholders.vim
 
 
@@ -29,7 +29,15 @@ endif
 
 
 if !exists('g:stakeholders#exclude_rx')
+    " Ignore placeholders with labels matching this |regexp|.
     let g:stakeholders#exclude_rx = '^\(TODO\|\)$'   "{{{2
+endif
+
+
+if !exists('g:stakeholders#undo_breaks')
+    " If non-null, break the undo sequence (see |i_CTRL-G_u|) before 
+    " updating the replacement string.
+    let g:stakeholders#undo_breaks = 1   "{{{2
 endif
 
 
@@ -205,6 +213,9 @@ function! s:CursorMoved(mode) "{{{3
                                 call s:Init(w:stakeholders, pos)
                             endif
                             let w:stakeholders.replacement = replacement
+                            if g:stakeholders#undo_breaks && a:mode == 'i'
+                                call feedkeys("\<c-g>u")
+                            endif
                             " TLogVAR w:stakeholders.replacement
                             let pos = w:stakeholders.Update(pos)
                             return
