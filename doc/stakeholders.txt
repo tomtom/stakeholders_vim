@@ -51,6 +51,9 @@ Contents~
         g:stakeholders#def .................... |g:stakeholders#def|
         g:stakeholders#expansion .............. |g:stakeholders#expansion|
         g:stakeholders#exclude_rx ............. |g:stakeholders#exclude_rx|
+        g:stakeholders#undo_breaks ............ |g:stakeholders#undo_breaks|
+        stakeholders#Disable .................. |stakeholders#Disable()|
+        stakeholders#Enable ................... |stakeholders#Enable()|
         stakeholders#EnableInRange ............ |stakeholders#EnableInRange()|
         stakeholders#EnableBuffer ............. |stakeholders#EnableBuffer()|
         stakeholders#DisableBuffer ............ |stakeholders#DisableBuffer()|
@@ -74,6 +77,18 @@ g:stakeholders#expansion       (default: 'immediate')
 
                                                     *g:stakeholders#exclude_rx*
 g:stakeholders#exclude_rx      (default: '^\(TODO\|\)$')
+    Ignore placeholders with labels matching this |regexp|.
+
+                                                    *g:stakeholders#undo_breaks*
+g:stakeholders#undo_breaks     (default: 0)
+    If non-null, break the undo sequence (see |i_CTRL-G_u|) before 
+    updating the replacement string.
+
+                                                    *stakeholders#Disable()*
+stakeholders#Disable()
+
+                                                    *stakeholders#Enable()*
+stakeholders#Enable()
 
                                                     *stakeholders#EnableInRange()*
 stakeholders#EnableInRange(line1, line2)

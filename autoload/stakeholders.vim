@@ -1,16 +1,8 @@
-" stakeholders.vim
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
 " @Last Change: 2010-11-19.
-" @Revision:    735
-" GetLatestVimScripts: 3326 0 :AutoInstall: stakeholders.vim
-
-
-if exists('loaded_stakeholders')
-    " finish
-endif
-let loaded_stakeholders = 1
+" @Revision:    768
 
 
 if !exists('g:stakeholders#def')
@@ -37,29 +29,81 @@ endif
 if !exists('g:stakeholders#undo_breaks')
     " If non-null, break the undo sequence (see |i_CTRL-G_u|) before 
     " updating the replacement string.
-    let g:stakeholders#undo_breaks = 1   "{{{2
+    let g:stakeholders#undo_breaks = 0   "{{{2
 endif
 
 
-augroup stakeholders
-    autocmd!
-    " autocmd BufWinEnter,WinEnter * call s:Enter()
-    " autocmd WinLeave * call s:Leave()
-augroup END
 
 
-" function! stakeholders#Disable() "{{{3
-"     augroup stakeholders
-"         autocmd! BufEnter *
-"     augroup END
-" endf
+if !has_key(g:stakeholders#def, 'Replace')
+    " :nodoc:
+    function! g:stakeholders#def.Replace(text) dict "{{{3
+        return substitute(a:text, self.placeholder_rx, escape(self.replacement, '\&~'), 'g')
+    endf
+endif
 
 
-" function! stakeholders#Enable() "{{{3
-"     augroup stakeholders
-"         autocmd BufNew,BufNewFile * call stakeholders#EnableBuffer()
-"     augroup END
-" endf
+if !has_key(g:stakeholders#def, 'ReplacePlaceholderInCurrentLine')
+    " :nodoc:
+    function! g:stakeholders#def.ReplacePlaceholderInCurrentLine(pos, line, rline) dict "{{{3
+        let m = matchlist(a:rline, printf(self.prepost_rx_fmt, self.replacement))
+        " TLogVAR m
+        if empty(m)
+            let n1 = len(self.pre)
+            echom "Internal error stakeholders#def.ReplacePlaceholderInCurrentLine:" a:rline self.prepost_rx_fmt
+        else
+            let n1 = len(m[1])
+        endif
+        let pre = self.Replace(self.pre)
+        let n2 = len(pre)
+        let post = self.Replace(self.post)
+        let line1 = pre . self.replacement . post
+        " echom "DBG End" n1 n2 pre
+        let pos = copy(a:pos)
+        if n1 != n2
+            let delta = - n1 + n2
+            let pos[2] += delta
+        endif
+        return [pos, line1]
+    endf
+endif
+
+
+let s:enable_globally = 0
+
+function! stakeholders#Disable() "{{{3
+    if exists('#stakeholders')
+        au! stakeholders
+        aug! stakeholders
+        let view = winsaveview()
+        try
+            silent windo unlet! w:stakeholders
+            silent bufdo unlet! b:stakeholders
+        finally
+            call winrestview(view)
+        endtry
+    endif
+    let s:enable_globally = 0
+endf
+
+
+function! stakeholders#Enable() "{{{3
+    if !s:enable_globally
+        if !exists('#stakeholders')
+            augroup stakeholders
+                autocmd!
+            augroup END
+        endif
+        autocmd stakeholders BufNewFile,BufReadPost * call stakeholders#EnableBuffer()
+        let view = winsaveview()
+        try
+            silent bufdo call stakeholders#EnableBuffer()
+        finally
+            call winrestview(view)
+        endtry
+        let s:enable_globally = 1
+    endif
+endf
 
 
 " Enable stakeholders for a range of lines.
@@ -74,9 +118,14 @@ endf
 
 " Enable stakeholders for the current buffer.
 function! stakeholders#EnableBuffer() "{{{3
+    if !exists('#stakeholders')
+        augroup stakeholders
+            autocmd!
+        augroup END
+    endif
     if !exists('b:stakeholders')
         let b:stakeholders = exists('b:stakeholders_def') ? 
-                    \ b:stakeholders_def.rx : g:stakeholders#def.rx
+                    \ b:stakeholders_def : g:stakeholders#def
         " echom "DBG stakeholders#EnableBuffer" b:stakeholders
         autocmd stakeholders CursorMoved,CursorMovedI <buffer> call s:CursorMoved(mode())
         " autocmd stakeholders InsertEnter,InsertLeave <buffer> call s:CursorMoved(mode())
@@ -104,14 +153,15 @@ function! s:SetContext(pos, mode) "{{{3
     endif
     " TLogVAR pos
     let lnum = pos[1]
-    if exists('b:stakeholders_range') && (lnum < b:stakeholders_range[0] || lnum > b:stakeholders_range[1])
+    if exists('b:stakeholders_range')
+                \ && (lnum < b:stakeholders_range[0]
+                \ || lnum > b:stakeholders_range[1])
         call stakeholders#DisableBuffer()
     else
-        let w:stakeholders = {
-                    \ 'lnum': lnum
-                    \ }
+        let w:stakeholders = copy(b:stakeholders)
+        let w:stakeholders.lnum = lnum
         let line = getline(lnum)
-        if line !~ b:stakeholders
+        if line !~ w:stakeholders.rx
             let w:stakeholders.line = ''
         else
             let w:stakeholders.line = line
@@ -129,7 +179,7 @@ function! s:SetParts(ph_def, line, col) "{{{3
     " function! stakeholders#SetParts(ph_def, line, col) "{{{3
     " TLogVAR a:col
     let a:ph_def.pre = ''
-    let parts = split(a:line, b:stakeholders .'\zs')
+    let parts = split(a:line, w:stakeholders.rx .'\zs')
     let c = 0
     for i in range(len(parts))
         let part = parts[i]
@@ -139,7 +189,7 @@ function! s:SetParts(ph_def, line, col) "{{{3
             let a:ph_def.pre .= part
             let c = plen
         else
-            let phbeg = match(part, b:stakeholders .'$')
+            let phbeg = match(part, w:stakeholders.rx .'$')
             if phbeg != -1
                 let pre = strpart(part, 0, phbeg)
                 let prelen = c + len(pre)
@@ -189,8 +239,8 @@ function! s:CursorMoved(mode) "{{{3
                 let post0 = w:stakeholders.post
                 let init = !has_key(w:stakeholders, 'replacement')
                 if !init
-                    let pre0 = stakeholders#Replace(w:stakeholders, pre0)
-                    let post0 = stakeholders#Replace(w:stakeholders, post0)
+                    let pre0 = w:stakeholders.Replace(pre0)
+                    let post0 = w:stakeholders.Replace(post0)
                 endif
                 " TLogVAR pre0, post0
                 let lpre = len(pre0)
@@ -217,7 +267,9 @@ function! s:CursorMoved(mode) "{{{3
                                 call feedkeys("\<c-g>u")
                             endif
                             " TLogVAR w:stakeholders.replacement
-                            let pos = w:stakeholders.Update(pos)
+                            if exists('w:stakeholders.Update')
+                                let pos = w:stakeholders.Update(pos)
+                            endif
                             return
                         endif
                     endif
@@ -228,14 +280,6 @@ function! s:CursorMoved(mode) "{{{3
     finally
         call setpos('.', pos)
     endtry
-endf
-
-
-function! s:Enter() "{{{3
-endf
-
-
-function! s:Leave() "{{{3
 endf
 
 
@@ -258,36 +302,6 @@ function! s:Init(ph_def, pos) "{{{3
         keepjumps call setpos('.', a:pos)
     endtry
     call stakeholders#{g:stakeholders#expansion}#Init(a:ph_def)
-endf
-
-
-" :nodoc:
-function! stakeholders#Replace(ph_def, text) "{{{3
-    return substitute(a:text, a:ph_def.placeholder_rx, escape(a:ph_def.replacement, '\&~'), 'g')
-endf
-
-
-" :nodoc:
-function! stakeholders#ReplacePlaceholderInCurrentLine(ph_def, pos, line, rline) "{{{3
-    let m = matchlist(a:rline, printf(a:ph_def.prepost_rx_fmt, a:ph_def.replacement))
-    " TLogVAR m
-    if empty(m)
-        let n1 = len(a:ph_def.pre)
-        echom "Internal error stakeholders#ReplacePlaceholderInCurrentLine:" a:rline a:ph_def.prepost_rx_fmt
-    else
-        let n1 = len(m[1])
-    endif
-    let pre = stakeholders#Replace(a:ph_def, a:ph_def.pre)
-    let n2 = len(pre)
-    let post = stakeholders#Replace(a:ph_def, a:ph_def.post)
-    let line1 = pre . a:ph_def.replacement . post
-    " echom "DBG End" n1 n2 pre
-    let pos = copy(a:pos)
-    if n1 != n2
-        let delta = - n1 + n2
-        let pos[2] += delta
-    endif
-    return [pos, line1]
 endf
 
 
