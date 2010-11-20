@@ -1,8 +1,8 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-19.
-" @Revision:    768
+" @Last Change: 2010-11-20.
+" @Revision:    770
 
 
 if !exists('g:stakeholders#def')
@@ -296,8 +296,13 @@ function! s:Init(ph_def, pos) "{{{3
                 \ . substitute(post_fmt, a:ph_def.placeholder_rx, '\\(\\.\\{-}\\)', 'g')
                 \ .'\)\$'
     " TLogVAR a:ph_def
+    if exists('b:stakeholders_range')
+        let range = join(b:stakeholders_range, ',')
+    else
+        let range = ''
+    endif
     try
-        exec 'keepjumps g/'. escape(a:ph_def.placeholder_rx, '/') .'/let a:ph_def.lines[line(".")] = getline(".")'
+        exec 'keepjumps' range .'g/'. escape(a:ph_def.placeholder_rx, '/') .'/let a:ph_def.lines[line(".")] = getline(".")'
     finally
         keepjumps call setpos('.', a:pos)
     endtry
