@@ -3,14 +3,14 @@
 " @GIT:         http://github.com/tomtom/stakeholders_vim
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-19.
-" @Last Change: 2010-11-19.
-" @Revision:    9
+" @Last Change: 2010-11-22.
+" @Revision:    10
 " GetLatestVimScripts: 3326 0 :AutoInstall: stakeholders.vim
 
 if &cp || exists("loaded_stakeholders")
     finish
 endif
-let loaded_stakeholders = 1
+let loaded_stakeholders = 2
 
 let s:save_cpo = &cpo
 set cpo&vim
