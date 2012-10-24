@@ -1,14 +1,14 @@
 " @Author:      Tom Link (mailto:micathom AT gmail com?subject=[vim])
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
-" @Last Change: 2010-11-20.
-" @Revision:    770
+" @Last Change: 2012-10-23.
+" @Revision:    779
 
 
 if !exists('g:stakeholders#def')
     " The placeholder definition. A dictionary with the fields:
     "   rx ....... A |regexp| that matches placeholders.
-    let g:stakeholders#def = {'rx': '<+\([[:alpha:]_]\+\)+>'}   "{{{2
+    let g:stakeholders#def = {'rx': '<+\([[:alnum:]_]\+\)\(/.\{-}\)\?+>'}   "{{{2
 endif
 
 
@@ -197,6 +197,7 @@ function! s:SetParts(ph_def, line, col) "{{{3
                 if prelen <= a:col
                     let a:ph_def.pre .= pre
                     let placeholder = strpart(part, phbeg)
+                    let placeholder = substitute(placeholder, '^<+[^/]*\zs/.\{-}\ze+>$', '', '')
                     let a:ph_def.placeholder = placeholder
                     let a:ph_def.post = join(parts[i + 1 : -1], '')
                     " TLogVAR a:ph_def
@@ -297,7 +298,8 @@ function! s:Init(ph_def, pos) "{{{3
                 \ .'\)\$'
     " TLogVAR a:ph_def
     if exists('b:stakeholders_range')
-        let range = join(b:stakeholders_range, ',')
+        let llnum = line('$')
+        let range = join(map(copy(b:stakeholders_range), 'min([v:val, llnum])'), ',')
     else
         let range = ''
     endif
