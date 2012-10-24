@@ -58,15 +58,15 @@ Contents~
         stakeholders#EnableInRange ............ |stakeholders#EnableInRange()|
         stakeholders#EnableBuffer ............. |stakeholders#EnableBuffer()|
         stakeholders#DisableBuffer ............ |stakeholders#DisableBuffer()|
-        stakeholders#immediate#Init ........... |stakeholders#immediate#Init()|
         stakeholders#delayed#Init ............. |stakeholders#delayed#Init()|
+        stakeholders#immediate#Init ........... |stakeholders#immediate#Init()|
 
 
 ========================================================================
 autoload/stakeholders.vim~
 
                                                     *g:stakeholders#def*
-g:stakeholders#def             (default: {'rx': '<+\([[:alpha:]_]\+\)+>'})
+g:stakeholders#def             (default: {'rx': '<+\([[:alnum:]_]\+\)\(/.\{-}\)\?+>'})
     The placeholder definition. A dictionary with the fields:
       rx ....... A |regexp| that matches placeholders.
 
@@ -105,20 +105,20 @@ stakeholders#DisableBuffer()
 
 
 ========================================================================
-autoload/stakeholders/immediate.vim~
-
-                                                    *stakeholders#immediate#Init()*
-stakeholders#immediate#Init(ph_def)
-    Expand placeholders as the user types.
-
-
-========================================================================
 autoload/stakeholders/delayed.vim~
 
                                                     *stakeholders#delayed#Init()*
 stakeholders#delayed#Init(ph_def)
     Replace placeholders after the cursor leaves the pre-defined place or 
     the moves to another line.
+
+
+========================================================================
+autoload/stakeholders/immediate.vim~
+
+                                                    *stakeholders#immediate#Init()*
+stakeholders#immediate#Init(ph_def)
+    Expand placeholders as the user types.
 
 
 
