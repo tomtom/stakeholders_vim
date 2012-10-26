@@ -2,7 +2,7 @@
 " @License:     GPL (see http://www.gnu.org/licenses/gpl.txt)
 " @Created:     2010-11-02.
 " @Last Change: 2012-10-23.
-" @Revision:    779
+" @Revision:    782
 
 
 if !exists('g:stakeholders#def')
@@ -304,7 +304,7 @@ function! s:Init(ph_def, pos) "{{{3
         let range = ''
     endif
     try
-        exec 'keepjumps' range .'g/'. escape(a:ph_def.placeholder_rx, '/') .'/let a:ph_def.lines[line(".")] = getline(".")'
+        exec 'silent! keepjumps' range .'g/'. escape(a:ph_def.placeholder_rx, '/') .'/let a:ph_def.lines[line(".")] = getline(".")'
     finally
         keepjumps call setpos('.', a:pos)
     endtry
