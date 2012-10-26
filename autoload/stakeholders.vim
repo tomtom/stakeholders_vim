@@ -127,9 +127,9 @@ function! stakeholders#EnableBuffer() "{{{3
         let b:stakeholders = exists('b:stakeholders_def') ? 
                     \ b:stakeholders_def : g:stakeholders#def
         " echom "DBG stakeholders#EnableBuffer" b:stakeholders
-        autocmd stakeholders CursorMoved,CursorMovedI <buffer> call s:CursorMoved(mode())
-        " autocmd stakeholders InsertEnter,InsertLeave <buffer> call s:CursorMoved(mode())
-        call s:CursorMoved('n')
+        autocmd stakeholders CursorMoved,CursorMovedI <buffer> call stakeholders#CursorMoved(mode())
+        " autocmd stakeholders InsertEnter,InsertLeave <buffer> call stakeholders#CursorMoved(mode())
+        call stakeholders#CursorMoved('n')
     endif
 endf
 
@@ -226,7 +226,7 @@ function! s:Col(col, mode) "{{{3
 endf
 
 
-function! s:CursorMoved(mode) "{{{3
+function! stakeholders#CursorMoved(mode) "{{{3
     let pos = getpos('.')
     " TLogVAR a:mode, pos
     try
