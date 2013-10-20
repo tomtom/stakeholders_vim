@@ -58,6 +58,7 @@ Contents~
         stakeholders#EnableInRange ............ |stakeholders#EnableInRange()|
         stakeholders#EnableBuffer ............. |stakeholders#EnableBuffer()|
         stakeholders#DisableBuffer ............ |stakeholders#DisableBuffer()|
+        stakeholders#CursorMoved .............. |stakeholders#CursorMoved()|
         stakeholders#delayed#Init ............. |stakeholders#delayed#Init()|
         stakeholders#immediate#Init ........... |stakeholders#immediate#Init()|
 
@@ -102,6 +103,9 @@ stakeholders#EnableBuffer()
                                                     *stakeholders#DisableBuffer()*
 stakeholders#DisableBuffer()
     Disable stakeholders for the current buffer.
+
+                                                    *stakeholders#CursorMoved()*
+stakeholders#CursorMoved(mode)
 
 
 ========================================================================
