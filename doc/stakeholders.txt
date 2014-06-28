@@ -49,6 +49,8 @@ See :help vimball for details.
 ========================================================================
 Contents~
 
+        :StakeholdersEnable ................... |:StakeholdersEnable|
+        :StakeholdersDisable .................. |:StakeholdersDisable|
         g:stakeholders#def .................... |g:stakeholders#def|
         g:stakeholders#expansion .............. |g:stakeholders#expansion|
         g:stakeholders#exclude_rx ............. |g:stakeholders#exclude_rx|
@@ -61,6 +63,20 @@ Contents~
         stakeholders#CursorMoved .............. |stakeholders#CursorMoved()|
         stakeholders#delayed#Init ............. |stakeholders#delayed#Init()|
         stakeholders#immediate#Init ........... |stakeholders#immediate#Init()|
+
+
+========================================================================
+plugin/stakeholders.vim~
+
+                                                    *:StakeholdersEnable*
+:StakeholdersEnable[!]
+    Enable stakeholders for the current buffer.
+    With the optional '!', enable stakeholders globally.
+
+                                                    *:StakeholdersDisable*
+:StakeholdersDisable[!]
+    Disable stakeholders for the current buffer.
+    With the optional '!', disable stakeholders globally.
 
 
 ========================================================================
@@ -126,4 +142,4 @@ stakeholders#immediate#Init(ph_def)
 
 
 
-vim:tw=78:fo=tcq2:isk=!-~,^*,^|,^":ts=8:ft=help:norl:
+vim:tw=78:fo=w2croql:isk=!-~,^*,^|,^":ts=8:ft=help:norl:
